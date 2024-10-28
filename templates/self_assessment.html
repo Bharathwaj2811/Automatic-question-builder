@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self Assessment</title>
+</head>
+<body>
+    <h1>Assessment Questions</h1>
+    <form action="/submit_assessment" method="POST">
+        <div>
+            {{ questions|safe }} <!-- Render questions here -->
+        </div>
+        <button type="submit">Submit Answers</button>
+    </form>
+</body>
+</html>

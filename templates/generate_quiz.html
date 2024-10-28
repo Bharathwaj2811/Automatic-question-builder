@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .option {
+            margin: 10px 0;
+        }
+
+        label {
+            margin-left: 10px;
+            color: #333;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz</h1>
+        <div id="quiz-questions">
+            <!-- Questions will be loaded here -->
+        </div>
+        <button id="submit-btn" onclick="submitQuiz()">Submit Quiz</button>
+    </div>
+
+    <div id="result" style="display: none;">
+        <h2>Results</h2>
+        <p id="score"></p>
+    </div>
+
+    <script>
+        // Fetch quiz questions from the server
+        function loadQuiz() {
+            fetch('/generate_quiz')
+                .then(response => response.json())
+                .then(data => {
+                    const quizContainer = document.getElementById('quiz-questions');
+                    quizContainer.innerHTML = '';
+
+                    data.forEach((question, index) => {
+                        let optionsHtml = '';
+                        let options = JSON.parse(question.options);
+                        
+                        for (const [key, value] of Object.entries(options)) {
+                            optionsHtml += `
+                                <div class="option">
+                                    <input type="radio" name="question${question.id}" value="${key}">
+                                    <label>${value}</label>
+                                </div>
+                            `;
+                        }
+
+                        const questionHtml = `
+                            <div class="question">
+                                <h3>Question ${index + 1}: ${question.question}</h3>
+                                ${optionsHtml}
+                            </div>
+                        `;
+
+                        quizContainer.innerHTML += questionHtml;
+                    });
+                });
+        }
+
+        // Submit the answers to the server
+        function submitQuiz() {
+            const quizContainer = document.getElementById('quiz-questions');
+            const inputs = quizContainer.getElementsByTagName('input');
+            const answers = {};
+
+            // Collect user answers
+            for (let input of inputs) {
+                if (input.checked) {
+                    const questionId = input.name.replace('question', '');
+                    answers[questionId] = input.value;
+                }
+            }
+
+            // Send answers to the server
+            fetch('/submit_answers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ answers })
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('score').innerText = `You scored ${result.score} out of ${result.total_questions}`;
+            });
+        }
+
+        window.onload = loadQuiz; // Load quiz when the page loads
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Achievement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            border: 10px solid #f1c40f;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        .certificate {
+            width: 600px;
+            border: 5px solid #f39c12;
+            padding: 20px;
+            background-color: #fbf8f1;
+            margin-bottom: 20px; /* Spacing between certificate and button */
+        }
+        h1, h2, p {
+            color: #2c3e50;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .button-container {
+            text-align: center;
+        }
+        .dashboard-button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .dashboard-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <h1>Certificate of Achievement 🌟</h1>
+        <p><strong>Presented to</strong></p>
+        <h2>{{ employee_name }}</h2>
+        <p><em>In Recognition of Successful Completion of the Assessment</em></p>
+        <p>This certificate is proudly awarded for demonstrating exceptional dedication, hard work, and excellence by successfully completing the assessment.</p>
+        <p>Your outstanding performance reflects the skills and commitment we highly value at Hexaware.</p>
+        <p>Congratulations and Best Wishes for Continued Success!</p>
+        <div class="footer">
+            Awarded on {{ award_date }}<br>
+            From the Hexaware Team
+        </div>
+    </div>
+    <div class="button-container">
+        <a href="/employee_dashboard" class="dashboard-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

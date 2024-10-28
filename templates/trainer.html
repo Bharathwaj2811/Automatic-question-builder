@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Existing styles for layout and theme */
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #155724;
+            text-decoration: underline;
+        }
+        .content-container {
+            margin-top: 70px;
+        }
+        .dashboard-card {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .dashboard-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .notification-bar {
+            display: none; /* Initially hidden */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #ffc107;
+            color: #212529;
+            padding: 10px;
+            text-align: center;
+            z-index: 1001;
+        }
+        .btn {
+            margin: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-info:hover {
+            background-color: #17a2b8;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .text-center {
+            margin-top: 20px;
+        }
+        #content {
+            margin-top: 30px;
+        }
+        .lead {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Notification Bar -->
+<div class="notification-bar" id="notificationBar">
+    New feedback received from an employee! 
+    <button class="btn btn-danger btn-sm float-right" onclick="dismissNotification()">Dismiss</button>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">Trainer Dashboard</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:void(0);" onclick="loadPage('/upload_curriculum')">Upload Curriculum</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:void(0);" data-toggle="modal" data-target="#formatModal">Generate Question Bank</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('download_question_bank') }}">Download Question Bank</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_feedback') }}">View Feedback</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Main Content Area -->
+<div class="content-container">
+    <div class="container mt-5">
+        <h1 class="text-center">Welcome to the Trainer Dashboard</h1>
+
+        <div id="content" class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="dashboard-card text-center">
+                    <p class="lead">Select an option from the navigation bar to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Selecting Question Bank Format -->
+<div class="modal fade" id="formatModal" tabindex="-1" aria-labelledby="formatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formatModalLabel">Select Question Format</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Please select the question format you wish to generate:</p>
+                <button class="btn btn-primary btn-block" onclick="loadObjective()">Objective</button>
+                <button class="btn btn-secondary btn-block" onclick="loadSubjective()">Subjective</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function loadPage(pageUrl) {
+        $('#content').load(pageUrl, function(response, status, xhr) {
+            if (status === "error") {
+                var msg = "Sorry but there was an error: ";
+                $('#content').html(msg + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    // Functions for loading specific question format pages
+    function loadObjective() {
+        $('#formatModal').modal('hide');
+        loadPage('/auto_questions'); // Route to the auto_questions page
+    }
+
+    function loadSubjective() {
+        $('#formatModal').modal('hide');
+        loadPage('/index1'); // Route to the index page
+    }
+
+    function showNotification() {
+        $('#notificationBar').fadeIn().delay(5000).fadeOut(); // Show and then hide after 5 seconds
+    }
+
+    function dismissNotification() {
+        $('#notificationBar').fadeOut(); // Hide the notification
+    }
+
+    // Poll for new feedback
+    setInterval(function() {
+        $.get('/check_feedback', function(data) {
+            if (data.new_feedback) {
+                showNotification(); // Show notification if there's new feedback
+            }
+        });
+    }, 10000); // Check every 10 seconds
+</script>
+
+</body>
+</html>

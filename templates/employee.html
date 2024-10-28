@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Georgia', serif;
+        }
+        .dashboard-container {
+            margin: 30px auto;
+            max-width: 900px;
+        }
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .card-header {
+            background-color: #4a7c59;
+            color: white;
+            font-size: 18px;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        h1, h2, p {
+            color: #333;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn-primary, .btn-secondary, .btn-danger {
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .status-message {
+            font-weight: bold;
+            color: green;
+        }
+        .new-tasks-message {
+            font-weight: bold;
+            color: blue;
+            margin-top: 20px;
+        }
+        .incomplete-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container dashboard-container">
+    <h1>Employee Dashboard</h1>
+
+    <!-- Logout Button -->
+    <div class="text-right mb-4">
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+    </div>
+
+    <div class="row">
+        <!-- Self-Assessment Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Self-Assessment
+                </div>
+                <div class="card-body">
+                    <p>Use the generated question banks for self-assessment and practice.</p>
+                    <a href="{{ url_for('selfa') }}" class="btn btn-primary">Self-Assessment Questions</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Submission Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Feedback Submission
+                </div>
+                <div class="card-body">
+                    <p>Provide feedback on the quality and relevance of questions for continuous improvement.</p>
+                    <a href="{{ url_for('feedback') }}" class="btn btn-primary">Submit Feedback</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Learning Development Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Learning and Development
+                </div>
+                <div class="card-body">
+                    <p>Utilize question banks to enhance your skills and knowledge in specific technologies.</p>
+                    <a href="{{ url_for('download_question_banks') }}" class="btn btn-primary">View Question Banks</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Plan Request Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Learning Plan Request
+                </div>
+                <div class="card-body">
+                    <p>Request personalized learning plans to further develop your technical skills.</p>
+                    <a href="/learning-plan" class="btn btn-primary">Request Learning Plan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Tasks Section -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Daily Tasks
+                </div>
+                <div class="card-body">
+                    <p>Complete the tasks below:</p>
+                    <ul>
+                        <li>Take the quiz (Score at least 50% to complete this task)</li>
+                    </ul>
+                    {% if task_completed %}
+                        <p class="status-message">Task Status: Completed</p>
+                        <p>You have already completed the task today. Please come back tomorrow!</p>
+                        <p class="new-tasks-message">✅ New tasks will be available tomorrow!</p>
+                    {% else %}
+                        <p class="incomplete-message"></p>
+                        <button class="btn btn-primary" onclick="window.location.href='/quiz'">Take Quiz</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

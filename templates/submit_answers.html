@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Submission Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .results-container {
+            margin-top: 50px;
+        }
+        .card-header {
+            background-color: #00b09b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container results-container">
+    <div class="card">
+        <div class="card-header">
+            Quiz Submission Results
+        </div>
+        <div class="card-body">
+            <h3 class="text-center">Your score: {{ score }} out of {{ total_questions }}</h3>
+            <p class="text-center">{{ completion_status }}</p>  <!-- Completion message based on score -->
+
+            {% if score / total_questions >= 50 %}  <!-- Check for completion -->
+            <div class="alert alert-success text-center">
+                Congratulations! You have completed today's tasks!
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center">
+                You did not complete today's tasks. Keep trying!
+            </div>
+            {% endif %}
+
+            <div class="text-center mt-4">
+                <a href="/quiz" class="btn btn-primary">Take Another Quiz</a>
+                <a href="/employee_dashboard" class="btn btn-secondary">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

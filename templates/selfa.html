@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks - Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"> <!-- Font Awesome for icons -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .guidelines {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #ffffff;
+        }
+        .guidelines h2 {
+            color: #007bff;
+        }
+        .quiz-container {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #00b09b;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .quiz-header {
+            background-color: #00b09b;
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+        }
+        .status-message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        #completionSection {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .try-again {
+            display: none;
+            margin-top: 20px;
+            color: red;
+            font-weight: bold;
+        }
+        .congrats-message {
+            display: none;
+            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+        }
+        #timer {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .scroll-indicator {
+            display: none; /* Initially hidden */
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #007bff; /* Color of the arrow */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Assessment</h1>
+
+        <!-- Guidelines Section -->
+        <div class="guidelines">
+            <h2>Start Assessment - Guidelines</h2>
+            <p><strong>Two-Round Format:</strong> The assessment consists of two rounds, each designed to test different aspects of your knowledge.</p>
+
+            <h4>Round 1 - Multiple-Choice Questions:</h4>
+            <ul>
+                <li>You will answer 5 multiple-choice questions in this round.</li>
+                <li><strong>Qualification Criteria:</strong> To proceed to Round 2, you must score 50% or higher in Round 1.</li>
+                <li>If you score below 50%, you will not be eligible for the next round.</li>
+            </ul>
+
+            <h4>Round 2 - Advanced Objective Questions:</h4>
+            <ul>
+                <li>Participants who qualify from Round 1 will take part in Round 2, which also includes multiple-choice questions.</li>
+                <li><strong>Certification Eligibility:</strong> To earn a certificate, you must score 50% or higher in this round.</li>
+                <li>If you score below 50% in Round 2, you will not receive a certificate.</li>
+            </ul>
+
+            <h4>Completion and Scoring:</h4>
+            <ul>
+                <li>Carefully review each question before submitting your answers, as your scores determine your eligibility for the next round and for certification.</li>
+                <li>You may only attempt each question once, so accuracy is key.</li>
+            </ul>
+
+            <h4>Certification:</h4>
+            <ul>
+                <li>Only participants who qualify in both rounds (scoring at least 50% in each) will be awarded a certificate in recognition of their achievement.</li>
+            </ul>
+        </div>
+
+        <button id="startQuiz" class="btn btn-primary btn-lg btn-block mt-4">Start Assessment</button>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i> <!-- Font Awesome down arrow -->
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="quiz-container">
+            <div class="quiz-header">
+                <h3>Quiz Questions</h3>
+            </div>
+            <form id="quizForm">
+                <div id="questionsContainer"></div>
+                <button type="submit" class="btn btn-success mt-3">Submit Answers</button>
+            </form>
+            <div id="completionMessage" class="status-message" style="display:none;"></div>
+            <div class="try-again" id="tryAgainMessage">
+                <p>You did not pass the quiz. Better luck next time!</p>
+                <button id="retakeQuiz" class="btn btn-warning">Retake Quiz</button>
+            </div>
+            <div class="congrats-message" id="congratsMessage">
+                <p>Congratulations! You passed the quiz!</p>
+                <p id="timer">Redirecting in <span id="countdown">5</span> seconds...</p>
+            </div>
+        </div>
+
+        <div id="completionSection">
+            <h2>Today's Tasks Completed!</h2>
+            <span style="font-size: 48px; color: green;">✔️</span>
+            <p>Come back tomorrow for new tasks!</p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Check if tasks are completed
+            $.get('/check_tasks_completed', function(data) {
+                if (data.completed) {
+                    $('#startQuiz').prop('disabled', true);  // Disable start quiz button
+                    $('#completionSection').show();  // Show the completion message
+                } else {
+                    $('#startQuiz').prop('disabled', false);  // Enable button for new tasks
+                }
+            });
+
+            $('#startQuiz').click(function() {
+                $('.scroll-indicator').fadeIn(); // Show the scroll indicator
+                $('html, body').animate({ scrollTop: $(".guidelines").offset().top }, 1000); // Scroll to the guidelines section
+
+                $.get('/generate_quiz', function(data) {
+                    $('#questionsContainer').empty();  // Clear previous quiz content
+
+                    // Ensure we have exactly 5 questions
+                    if (data.length === 5) {
+                        data.forEach(function(question) {
+                            const questionDiv = $('<div class="question"></div>');
+                            questionDiv.append(`<p><strong>${question.question_text}</strong></p>`);
+
+                            // Append options as radio buttons
+                            questionDiv.append(`
+                                <label><input type="radio" name="${question.question_text}" value="${question.option1}"> ${question.option1}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option2}"> ${question.option2}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option3}"> ${question.option3}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option4}"> ${question.option4}</label><br>
+                            `);
+                            $('#questionsContainer').append(questionDiv);
+                        });
+                        $('#quiz').show();  // Show the quiz section
+                    } else {
+                        alert("Not enough questions available for the quiz. Please check the database.");
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error fetching quiz questions:", textStatus, errorThrown);
+                    alert("Error loading quiz questions. Please try again.");
+                });
+            });
+
+            $('#quizForm').on('submit', function(e) {
+                e.preventDefault();  // Prevent default form submission
+                const userAnswers = {};
+                $(this).find('input[type="radio"]:checked').each(function() {
+                    const questionId = $(this).attr('name');
+                    userAnswers[questionId] = $(this).val();
+                });
+
+                // Check if all questions are answered
+                if (Object.keys(userAnswers).length < 5) {
+                    alert("Please answer all questions before submitting.");
+                    return;
+                }
+
+                // POST the answers to the server as JSON
+                $.ajax({
+                    type: 'POST',
+                    url: '/submit_answers',  // Ensure this matches the Flask route
+                    contentType: 'application/json',  // Set content type to JSON
+                    data: JSON.stringify({ answers: userAnswers }),  // Convert to JSON string
+                    success: function(result) {
+                        const passingScore = result.total_questions / 2;  // 50% of total questions
+                        if (result.score >= passingScore) {
+                            // Show congratulatory message and start countdown
+                            $('#congratsMessage').show();
+                            $('#completionMessage').text("You scored " + result.score + " out of " + result.total_questions).show();
+                            $('.scroll-indicator').fadeIn(); // Show the scroll indicator
+                            $('html, body').animate({ scrollTop: $('#completionMessage').offset().top }, 1000); // Scroll to the message
+                            let countdown = 5;
+                            const countdownInterval = setInterval(function() {
+                                $('#countdown').text(countdown);
+                                countdown--;
+                                if (countdown < 0) {
+                                    clearInterval(countdownInterval);
+                                    window.location.href = '/nextself';  // Redirect to nextself.html
+                                }
+                            }, 1000);  // Update every second
+                        } else {
+                            // Show try again message
+                            $('#tryAgainMessage').show();
+                            $('#completionMessage').text("You scored " + result.score + " out of " + result.total_questions).show();
+                            $('.scroll-indicator').fadeIn(); // Show the scroll indicator
+                            $('html, body').animate({ scrollTop: $('#completionMessage').offset().top }, 1000); // Scroll to the message
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error submitting answers: ", error);  // Log any errors
+                        alert("Error submitting answers. Please try again.");
+                    }
+                });
+            });
+
+            // Retake quiz button click handler
+            $('#retakeQuiz').click(function() {
+                $('#tryAgainMessage').hide(); // Hide the try again message
+                $('#quiz').hide(); // Hide the quiz section
+                $('#completionMessage').hide(); // Hide the completion message
+                $('#scroll-indicator').hide(); // Hide the scroll indicator
+                $('#startQuiz').click(); // Re-initiate the quiz
+            });
+        });
+    </script>
+</body>
+</html>

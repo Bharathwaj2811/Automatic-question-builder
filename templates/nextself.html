@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks - Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { margin-top: 30px; }
+        .quiz-container { display: none; margin-top: 20px; border: 1px solid #00b09b; border-radius: 8px; padding: 20px; background-color: #fff; }
+        .quiz-header { background-color: #00b09b; color: white; padding: 10px; border-radius: 5px 5px 0 0; }
+        .question { margin-bottom: 20px; }
+        .status-message { margin-top: 20px; font-weight: bold; color: #007bff; }
+        #completionSection { display: none; text-align: center; margin-top: 20px; }
+        #certificateSection { display: none; text-align: center; margin-top: 20px; }
+        .scroll-indicator {
+            display: none; /* Initially hidden */
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #007bff; /* Color of the arrow */
+        }
+        .countdown {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Daily Tasks Quiz</h1>
+        <button id="startQuiz" class="btn btn-primary btn-lg btn-block">Start Quiz</button>
+
+        <div id="quiz" class="quiz-container">
+            <div class="quiz-header">
+                <h3>Quiz Questions</h3>
+            </div>
+            <form id="quizForm">
+                <div id="questionsContainer"></div> <!-- Container for questions -->
+                <button type="submit" class="btn btn-success mt-3">Submit Answers</button>
+            </form>
+            <div id="completionMessage" class="status-message" style="display:none;"></div>
+            <div id="countdown" class="countdown" style="display: none;"></div>
+        </div>
+
+        <div id="completionSection">
+            <h2>Today's Tasks Completed!</h2>
+            <span style="font-size: 48px; color: green;">✔️</span>
+            <p>Come back tomorrow for new tasks!</p>
+        </div>
+
+        <div id="certificateSection" style="display: none; text-align: center;">
+            <h2>Congratulations!</h2>
+            <button id="downloadCertificate" class="btn btn-primary">Download Certificate</button>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i> <!-- Font Awesome down arrow -->
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Check if tasks are completed
+            $.get('/check_tasks_completed', function(data) {
+                if (data.completed) {
+                    $('#startQuiz').prop('disabled', true);  // Disable start quiz button
+                    $('#completionSection').show();  // Show the completion message
+                } else {
+                    $('#startQuiz').prop('disabled', false);  // Enable button for new tasks
+                }
+            });
+
+            $('#startQuiz').click(function() {
+                $.get('/generate_quiz', function(data) {
+                    $('#questionsContainer').empty();  // Clear previous quiz content
+
+                    if (data.length === 5) {
+                        data.forEach(function(question) {
+                            const questionDiv = $('<div class="question"></div>');
+                            questionDiv.append(`<p><strong>${question.question_text}</strong></p>`);
+
+                            // Render multiple choice options
+                            if (question.type === "multiple-choice") {
+                                question.options.forEach(function(option) {
+                                    questionDiv.append(`
+                                        <label><input type="radio" name="${question.question_text}" value="${option}"> ${option}</label><br>
+                                    `);
+                                });
+                            }
+
+                            // Always add a text input field for answering the question
+                            questionDiv.append(`
+                                <input type="text" name="${question.question_text}_answer" class="form-control" placeholder="Your answer here" required>
+                            `);
+
+                            $('#questionsContainer').append(questionDiv);
+                        });
+                        $('#quiz').show();  // Show the quiz section
+                    } else {
+                        alert("Not enough questions available for the quiz. Please check the database.");
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error fetching quiz questions:", textStatus, errorThrown);
+                    alert("Error loading quiz questions. Please try again.");
+                });
+            });
+
+            $('#quizForm').on('submit', function(e) {
+                e.preventDefault();  // Prevent default form submission
+                const userAnswers = {};
+
+                // Collect answers from multiple-choice questions
+                $(this).find('input[type="radio"]:checked').each(function() {
+                    const questionId = $(this).attr('name');
+                    userAnswers[questionId] = $(this).val();
+                });
+
+                // Collect answers from text input fields
+                $(this).find('input[type="text"]').each(function() {
+                    const questionId = $(this).attr('name').replace('_answer', '');  // Match the question without the suffix
+                    userAnswers[questionId] = $(this).val();
+                });
+
+                // Check if all questions are answered (at least 5 unique questions)
+                if (Object.keys(userAnswers).length < 5) {
+                    alert("Please answer all questions before submitting.");
+                    return;
+                }
+
+                // POST the answers to the server as JSON
+                $.ajax({
+                    type: 'POST',
+                    url: '/submit_answers',  // Ensure this matches the Flask route
+                    contentType: 'application/json',  // Set content type to JSON
+                    data: JSON.stringify({ answers: userAnswers }),  // Convert to JSON string
+                    success: function(result) {
+                        const percentage = (result.score / result.total_questions) * 100; // Calculate percentage
+
+                        $('#completionMessage').show();
+                        $('.scroll-indicator').fadeIn(); // Show the scroll indicator
+
+                        if (percentage >= 50) {
+                            $('#completionMessage').html("Congratulations! You've scored " + percentage.toFixed(2) + "%. Redirecting to your certificate...");
+                        } else {
+                            $('#completionMessage').html("You scored " + percentage.toFixed(2) + "%. Please try again.");
+                        }
+
+                        // Scroll to the completion message
+                        $('html, body').animate({ scrollTop: $('#completionMessage').offset().top }, 1000);
+
+                        // Countdown for redirect
+                        $('#countdown').show();
+                        let countdown = 4; // 4 seconds countdown
+                        $('#countdown').html("Redirecting in " + countdown + " seconds...");
+
+                        const countdownInterval = setInterval(function() {
+                            countdown--;
+                            $('#countdown').html("Redirecting in " + countdown + " seconds...");
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = '/certificate'; // Redirect to the Flask route
+                            }
+                        }, 1000); // 1000 milliseconds = 1 second
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error submitting answers: ", error);  // Log any errors
+                        alert("Error submitting answers. Please try again.");
+                    }
+                });
+            });
+
+            // Download certificate button click event
+            $('#downloadCertificate').click(function() {
+                window.location.href = '/certificate';  // Redirect to download certificate route
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full height of the viewport */
+    margin: 0; /* Remove default margin */
+    background-color: rgba(0, 0, 0, 0.927); /* Optional: background color */
+}
+
+.container {
+    display: flex;
+    justify-content: space-around; /* Equal spacing between forms */
+    width: 80%; /* Adjust as needed */
+    max-width: 1200px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}

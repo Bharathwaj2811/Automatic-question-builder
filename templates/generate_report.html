@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h1, h2 {
+            color: #28a745;
+        }
+        .container {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center">System Reports</h1>
+
+    <h2>User Activity Report</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Activity</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in user_activity %}
+            <tr>
+                <td>{{ activity.username }}</td>
+                <td>{{ activity.activity }}</td>
+                <td>{{ activity.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>System Performance Report</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for performance in system_performance %}
+            <tr>
+                <td>{{ performance.metric }}</td>
+                <td>{{ performance.value }}</td>
+                <td>{{ performance.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>User Feedback</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Feedback</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feedback in user_feedback %}
+            <tr>
+                <td>{{ feedback.username }}</td>
+                <td>{{ feedback.message }}</td>
+                <td>{{ feedback.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button id="generate-pdf" class="btn btn-primary">Generate PDF</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script>
+    document.getElementById('generate-pdf').addEventListener('click', function () {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(20);
+        doc.text("System Reports", 14, 22);
+        
+        doc.setFontSize(16);
+        doc.text("User Activity Report", 14, 40);
+        doc.autoTable({ html: '.table' });
+
+        doc.addPage();
+        doc.text("System Performance Report", 14, 40);
+        doc.autoTable({ html: '.table' });
+
+        doc.addPage();
+        doc.text("User Feedback", 14, 40);
+        doc.autoTable({ html: '.table' });
+
+        doc.save('system_reports.pdf');
+    });
+</script>
+
+</body>
+</html>

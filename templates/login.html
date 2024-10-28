@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Role Login</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* Global Styling */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .login-container h1 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container input, 
+        .login-container select {
+            margin-bottom: 20px;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .login-container input:focus, 
+        .login-container select:focus {
+            border-color: #00b09b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 176, 155, 0.5);
+        }
+
+        .login-container button {
+            padding: 15px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-container button:hover {
+            background-color: #218838;
+        }
+
+        .login-container button:active {
+            transform: scale(0.98);
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+        }
+
+        .login-container .bx {
+            font-size: 40px;
+            color: #00b09b;
+            margin-bottom: 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .login-container h1 {
+                font-size: 24px;
+            }
+
+            .login-container input, 
+            .login-container select {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .login-container button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <i class='bx bxs-user-circle'></i>
+        <h1>Login</h1>
+        
+        <!-- Error message display -->
+        {% if get_flashed_messages() %}
+            <div class="error-message">
+                {% for message in get_flashed_messages() %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Login Form -->
+        <form method="POST" action="{{ url_for('login') }}">
+            <!-- Username input -->
+            <input type="text" name="username" placeholder="Username" required>
+
+            <!-- Password input -->
+            <input type="password" name="password" placeholder="Password" required>
+
+            <!-- Role selection (admin, trainer, employee) -->
+            <select name="role" required>
+                <option value="">Select Role</option>
+                <option value="admin">Admin</option>
+                <option value="trainer">Trainer</option>
+                <option value="employee">Employee</option>
+            </select>
+
+            <!-- Submit button -->
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>

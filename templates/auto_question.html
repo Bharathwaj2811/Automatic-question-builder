@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='question_undraw.png') }}" class="img-fluid" style="max-width: 100%; height: auto; max-height: 300px;" alt="Question Illustration">
+        </div>
+        <div class="col-md-6">
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <h3 class="h3 text-center mb-4">Generate Questions & Answers</h3>
+                    
+                    <form method="POST" action="test_generate">
+                        <div class="mb-4">
+                            <div class="form-group">
+                                <label class="h6" for="exampleFormControlTextarea1">Input Text</label>
+                                <textarea name="itext" class="form-control" placeholder="Input Text?" rows="6" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="h6" for="noq">No of Questions</label>
+                                <input type="number" name="noq" class="form-control" placeholder="No. of Questions" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="h6" for="difficulty_level">Select Difficulty Level</label>
+                                <select class="custom-select" id="difficulty_level" name="difficulty_level" required>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="submit" class="btn btn-primary btn-lg btn-block" value="Generate">
+                    </form>
+                    
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

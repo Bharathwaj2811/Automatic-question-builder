@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Learning Plans</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #00b09b;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+        }
+        /* Custom button styling */
+        .back-dashboard-btn {
+            background-color: #007bff; /* Blue color */
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .back-dashboard-btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Personalized Learning Plans</h1>
+        
+        <div class="form-group">
+            <label for="languageSelect">Select Language:</label>
+            <select id="languageSelect" class="form-control">
+                <option value="">-- Choose a Language --</option>
+                <option value="Python">Python</option>
+                <option value="Java">Java</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="C++">C++</option>
+                <option value="Ruby">Ruby</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Machine Learning">Machine Learning</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="levelSelect">Select Level:</label>
+            <select id="levelSelect" class="form-control">
+                <option value="">-- Choose a Level --</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+
+        <button id="getPlan" class="btn btn-primary">Get Learning Plan</button>
+
+        <div id="result" class="result-container">
+            <h3>Your Learning Plan</h3>
+            <div id="resources"></div>
+            <div id="practice"></div>
+        </div>
+
+        <!-- Back to Training Dashboard Button -->
+        <a href="{{ url_for('employee_dashboard') }}" class="btn back-dashboard-btn">Back to Training Dashboard</a>
+    </div>
+    
+    <script>
+        const learningPlans = {
+            "Python": {
+                "beginner": {
+                    "resources": ["Automate the Boring Stuff with Python", "Codecademy"],
+                    "practice": ["LeetCode (easy)", "HackerRank"]
+                },
+                "intermediate": {
+                    "resources": ["Fluent Python", "Coursera"],
+                    "practice": ["CodeSignal (medium)", "Project Euler"]
+                },
+                "advanced": {
+                    "resources": ["Python Tricks", "edX MicroMasters"],
+                    "practice": ["TopCoder", "Codewars"]
+                }
+            },
+            "Java": {
+                "beginner": {
+                    "resources": ["Head First Java", "Codecademy Java Course"],
+                    "practice": ["LeetCode (easy)", "HackerRank"]
+                },
+                "intermediate": {
+                    "resources": ["Effective Java", "Coursera Java Specialization"],
+                    "practice": ["CodeSignal (medium)", "Project Euler"]
+                },
+                "advanced": {
+                    "resources": ["Java Concurrency in Practice", "edX MicroMasters in Java"],
+                    "practice": ["TopCoder", "Codewars"]
+                }
+            },
+            "JavaScript": {
+                "beginner": {
+                    "resources": ["Eloquent JavaScript", "freeCodeCamp"],
+                    "practice": ["LeetCode (easy)", "HackerRank"]
+                },
+                "intermediate": {
+                    "resources": ["You Don’t Know JS (book series)", "Udemy JavaScript Course"],
+                    "practice": ["CodeSignal (medium)", "Project Euler"]
+                },
+                "advanced": {
+                    "resources": ["JavaScript: The Good Parts", "Frontend Masters"],
+                    "practice": ["TopCoder", "Codewars"]
+                }
+            },
+            "C++": {
+                "beginner": {
+                    "resources": ["C++ Primer", "Codecademy C++ Course"],
+                    "practice": ["LeetCode (easy)", "HackerRank"]
+                },
+                "intermediate": {
+                    "resources": ["Effective C++", "Coursera C++ Specialization"],
+                    "practice": ["CodeSignal (medium)", "Project Euler"]
+                },
+                "advanced": {
+                    "resources": ["The C++ Programming Language", "edX C++ Course"],
+                    "practice": ["TopCoder", "Codewars"]
+                }
+            },
+            "Ruby": {
+                "beginner": {
+                    "resources": ["Learn Ruby the Hard Way", "Codecademy Ruby Course"],
+                    "practice": ["LeetCode (easy)", "HackerRank"]
+                },
+                "intermediate": {
+                    "resources": ["The Ruby Programming Language", "Coursera Ruby on Rails"],
+                    "practice": ["CodeSignal (medium)", "Project Euler"]
+                },
+                "advanced": {
+                    "resources": ["Programming Ruby 1.9", "RailsCasts"],
+                    "practice": ["TopCoder", "Codewars"]
+                }
+            },
+            "Web Development": {
+                "beginner": {
+                    "resources": ["HTML & CSS: Design and Build Websites", "freeCodeCamp HTML/CSS Course"],
+                    "practice": ["Codecademy Web Development", "Frontend Mentor"]
+                },
+                "intermediate": {
+                    "resources": ["JavaScript and JQuery: Interactive Front-End Web Development", "MDN Web Docs"],
+                    "practice": ["LeetCode (easy)", "Project-based learning"]
+                },
+                "advanced": {
+                    "resources": ["You Don’t Know JS (book series)", "Frontend Masters Advanced CSS"],
+                    "practice": ["Codewars", "Building full-stack applications"]
+                }
+            },
+            "Machine Learning": {
+                "beginner": {
+                    "resources": ["Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow", "Coursera ML Course by Andrew Ng"],
+                    "practice": ["Kaggle (beginner competitions)", "Google Colab"]
+                },
+                "intermediate": {
+                    "resources": ["Deep Learning with Python", "fast.ai Course"],
+                    "practice": ["Kaggle (intermediate competitions)", "TensorFlow Playground"]
+                },
+                "advanced": {
+                    "resources": ["Pattern Recognition and Machine Learning", "Deep Reinforcement Learning Hands-On"],
+                    "practice": ["Kaggle (advanced competitions)", "Building custom ML models"]
+                }
+            }
+        };
+
+        $('#getPlan').click(function() {
+            const language = $('#languageSelect').val();
+            const level = $('#levelSelect').val();
+
+            if (language && level) {
+                const plan = learningPlans[language][level];
+
+                if (plan) {
+                    $('#resources').html("<strong>Resources:</strong><br>" + plan.resources.join("<br>"));
+                    $('#practice').html("<strong>Practice:</strong><br>" + plan.practice.join("<br>"));
+                    $('#result').show();  // Show the result container
+                } else {
+                    alert("No plan available for this combination.");
+                    $('#result').hide();  // Hide the result container if no plan
+                }
+            } else {
+                alert("Please select both language and level.");
+                $('#result').hide();  // Hide the result container if selection is incomplete
+            }
+        });
+    </script>
+</body>
+</html>

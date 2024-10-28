@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1>Quiz Results</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Your Score</h5>
+            <p class="card-text">You scored <strong>{{ score }}</strong> out of <strong>{{ total_questions }}</strong>.</p>
+            <p class="card-text">Completion Status: 
+                <strong>{{ completion_message }}</strong>
+            </p>
+            <p class="card-text">Result Format: <strong>{{ score }} of {{ total_questions }}</strong></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

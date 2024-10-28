@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks - Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .quiz-container {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #00b09b;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .quiz-header {
+            background-color: #00b09b;
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .status-message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        #completionSection {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Assessment</h1>
+        <button id="startQuiz" class="btn btn-primary btn-lg btn-block">START ASSESSMENT</button>
+
+        <div id="quiz" class="quiz-container">
+            <div class="quiz-header">
+                <h3>Quiz Questions</h3>
+            </div>
+            <form id="quizForm">
+                <div id="questionsContainer"></div> <!-- Container for questions -->
+                <button type="submit" class="btn btn-success mt-3">Submit Answers</button>
+            </form>
+            <div id="completionMessage" class="status-message" style="display:none;"></div>
+        </div>
+
+        <div id="completionSection">
+            <h2>Today's Tasks Completed!</h2>
+            <span style="font-size: 48px; color: green;">✔️</span>
+            <p>Come back tomorrow for new tasks!</p>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            // Check if daily tasks are completed
+            $.get('/check_tasks_completed', function(data) {
+                if (data.completed) {
+                    $('#startQuiz').prop('disabled', true);  // Disable start quiz button if tasks are done
+                    $('#completionSection').show();           // Show the completion message
+                } else {
+                    $('#startQuiz').prop('disabled', false);  // Enable button for new tasks
+                }
+            });
+    
+            // Start quiz button click handler
+            $('#startQuiz').click(function() {
+                // Fetch quiz questions from the server
+                $.get('/generate_quiz', function(data) {
+                    $('#questionsContainer').empty();  // Clear previous quiz content, if any
+    
+                    // Ensure exactly 5 questions are provided
+                    if (data.length === 5) {
+                        data.forEach(function(question) {
+                            const questionDiv = $('<div class="question"></div>');
+                            questionDiv.append(`<p><strong>${question.question_text}</strong></p>`);
+    
+                            // Append options as radio buttons
+                            questionDiv.append(`
+                                <label><input type="radio" name="${question.question_text}" value="${question.option1}"> ${question.option1}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option2}"> ${question.option2}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option3}"> ${question.option3}</label><br>
+                                <label><input type="radio" name="${question.question_text}" value="${question.option4}"> ${question.option4}</label><br>
+                            `);
+                            $('#questionsContainer').append(questionDiv);
+                        });
+                        $('#quiz').show();  // Display the quiz section
+                    } else {
+                        alert("Not enough questions available for the quiz. Please check the database.");
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error fetching quiz questions:", textStatus, errorThrown);
+                    alert("Error loading quiz questions. Please try again.");
+                });
+            });
+    
+            // Quiz form submission handler
+            $('#quizForm').on('submit', function(e) {
+                e.preventDefault();  // Prevent default form submission
+    
+                const userAnswers = {};
+                $(this).find('input[type="radio"]:checked').each(function() {
+                    const questionId = $(this).attr('name');
+                    userAnswers[questionId] = $(this).val();
+                });
+    
+                // Ensure all questions are answered
+                if (Object.keys(userAnswers).length < 5) {
+                    alert("Please answer all questions before submitting.");
+                    return;
+                }
+    
+                // Submit answers to the server
+                $.ajax({
+                    type: 'POST',
+                    url: '/submit_answers',  // Ensure this matches the server route
+                    contentType: 'application/json',  // Set content type to JSON
+                    data: JSON.stringify({ answers: userAnswers }),  // Convert answers to JSON string
+                    success: function(result) {
+                        const passingScore = result.total_questions / 2;  // Calculate passing score (50%)
+    
+                        // Conditional redirection based on score
+                        if (result.score >= passingScore) {
+                            window.location.href = '/nextself';  // Redirect to the next task page if passing score
+                        } else {
+                            // Redirect to results page to show score
+                            window.location.href = `/submit_results?score=${result.score}&total_questions=${result.total_questions}`;
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error submitting answers: ", error);  // Log any errors
+                        alert("Error submitting answers. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

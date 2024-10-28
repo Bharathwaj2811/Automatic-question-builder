@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background-color: #28a745;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: white;
+            padding: 15px;
+            display: block;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #218838;
+        }
+        .content {
+            padding: 20px;
+        }
+        .navbar {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 sidebar">
+                <h2 class="text-center py-3 text-white">Admin Panel</h2>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#user-management">User Management</a>
+                <!-- <a href="#system-monitoring">System Monitoring</a> -->
+                <a href="#system-performance">System Performance</a> <!-- New Link -->
+                <!-- <a href="#reports">Reports</a> -->
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="col-md-10 content">
+                <nav class="navbar navbar-light">
+                    <span class="navbar-brand mb-0 h1">Admin Dashboard</span>
+                </nav>
+
+                <div class="container mt-4">
+                    <h3 id="dashboard">Dashboard Overview</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light text-dark">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active Users</h5>
+                                    <p class="card-text">Total: {{ total_users }}</p> <!-- Dynamic total user count -->
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-4">
+                            <div class="card bg-light text-dark">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tasks Completed</h5>
+                                    <p class="card-text">This Week: 15</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 id="user-management">User Management</h3>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Manage Users</h5>
+                            <a href="{{ url_for('create_user') }}" class="btn btn-success">Add New User</a>
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-warning">Edit User</a>
+                        </div>
+                    </div>
+
+                    <h3 id="system-performance">System Performance</h3>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">System Performance Metrics</h5>
+                            <a href="{{ url_for('system_performance') }}" class="btn btn-info">View System Performance</a>
+                        </div>
+                    </div>
+
+                    <!-- <h3 id="reports">Generate Reports</h3>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Generate Reports</h5>
+                            <a href="{{ url_for('generate_report') }}" class="btn btn-primary">Generate Report</a>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

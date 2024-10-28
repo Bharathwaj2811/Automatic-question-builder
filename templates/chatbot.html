@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <script>
+        async function generateQuestions() {
+            const questionType = document.querySelector('input[name="questionType"]:checked').value;
+            const response = await fetch('/generate_questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: questionType })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                displayQuestions(data);
+            } else {
+                alert(data.error);
+            }
+        }
+
+        function displayQuestions(questions) {
+            const questionContainer = document.getElementById('questionContainer');
+            questionContainer.innerHTML = '';  // Clear previous questions
+
+            questions.forEach(q => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                if (q.options) {
+                    questionDiv.innerHTML = `<p>${q.question}</p>`;
+                    const options = JSON.parse(q.options);
+                    options.forEach(option => {
+                        questionDiv.innerHTML += `<input type="radio" name="${q.question}" value="${option}">${option}<br>`;
+                    });
+                } else {
+                    questionDiv.innerHTML = `<p>${q.question}</p>`;
+                    questionDiv.innerHTML += `<input type="text" placeholder="Your answer...">`;
+                }
+                questionContainer.appendChild(questionDiv);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Chatbot Question Generator</h1>
+    <h3>Select Question Type:</h3>
+    <label><input type="radio" name="questionType" value="multiple" checked> Multiple Choice</label><br>
+    <label><input type="radio" name="questionType" value="fill_in_the_blank"> Fill in the Blank</label><br>
+    <label><input type="radio" name="questionType" value="subjective"> Subjective</label><br>
+    <button onclick="generateQuestions()">Generate Questions</button>
+
+    <div id="questionContainer"></div>
+</body>
+</html>
+

@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container mt-5">
+    <img src="{{ url_for('static', filename='online_test_undraw.png') }}" class="img-fluid mb-4" alt="Online Test Image">
+    
+    <div class="card border-light shadow-sm">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Generated Q&A</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="example" class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Question</th>
+                            <th>Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for qa in cresults %}
+                            <tr>
+                                <td>{{ qa[0] }}</td>
+                                <td>{{ qa[1] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
+{% endblock %}

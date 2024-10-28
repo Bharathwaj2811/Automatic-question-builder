@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Submission</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .feedback-container {
+            margin: 20px;
+            max-width: 600px;
+        }
+        .card-header {
+            background-color: #00b09b;
+            color: white;
+        }
+        .user-info {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container feedback-container">
+    <h1 class="my-4">Submit Your Feedback</h1>
+
+    <div class="card">
+        <div class="card-header">
+            Feedback Form
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('submit_feedback') }}" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username">
+                </div>
+                <input type="hidden" name="role" value="employee"> <!-- Set role to employee -->
+                <div class="form-group">
+                    <label for="feedbackText">Your Feedback</label>
+                    <textarea class="form-control" id="feedbackText" name="feedback" rows="5" placeholder="Enter your feedback here" required></textarea>
+                    <small id="feedbackHelp" class="form-text text-muted">Minimum 50 characters required.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                <div id="error-message" class="text-danger mt-3" style="display:none;">
+                    Your feedback must be at least 50 characters long.
+                </div>
+            </form>
+            <!-- Back to Training Dashboard button -->
+            <a href="{{ url_for('employee_dashboard') }}" class="btn btn-secondary mt-3">Back to Training Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
